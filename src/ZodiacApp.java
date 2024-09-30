@@ -9,67 +9,106 @@ public class ZodiacApp {
 
         while (continueApp) {
             String name = "";
-            int year,month,day ;
+            int year = 0, month = 0, day = 0;
             LocalDate birthDate = null;
             boolean validInput = false;
 
-            // Loop until valid inputs are entered
+            
             while (!validInput) {
                 try {
                     
                     System.out.print("Enter your name: ");
                     name = scanner.nextLine();
 
-                    
-                    if (!name.matches("[a-zA-Z]+")) {
-                        System.out.println("Invalid name. Please enter letters only.");  // Skip to the next iteration of the loop
-                        continue; 
+                    // Adjusted regex to allow letters, spaces, hyphens, and apostrophes
+                    if (!name.matches("[a-zA-Z\\s'-]+")) {
+                        System.out.println("Invalid name. Please enter only letters, spaces, hyphens, or apostrophes.");
+                        
                     }
 
-                    System.out.print("Enter your year of birth (YYYY): ");// Input year of birth
-                    year = Integer.parseInt(scanner.nextLine());
-                
-                    System.out.print("Enter your month of birth (MM): ");// Input month of birth
-                    month = Integer.parseInt(scanner.nextLine());
-                
-                    System.out.print("Enter your day of birth (DD): ");// Input day of birth
-                    day = Integer.parseInt(scanner.nextLine());
-             
-                    birthDate = LocalDate.of(year, month, day);// Create a LocalDate object from year, month, and day
-
-                    validInput = true;// If no exception is thrown, the input is valid
+                   
+                    boolean validYear = false;
+                    while (!validYear) {
+                        System.out.print("Enter your year of birth (YYYY): ");
+                        String yearInput = scanner.nextLine();
+                        
+                        
+                        if (yearInput.matches("\\d{4}")) {
+                            year = Integer.parseInt(yearInput);
+                            if (year >= 1900 && year <= LocalDate.now().getYear()) {
+                                validYear = true; // Valid year, proceed
+                            } else {
+                                System.out.println("Invalid year. Please enter a year between 1900 and " + LocalDate.now().getYear() + ".");
+                            }
+                        } else {
+                            System.out.println("Invalid input. Please enter a valid 4-digit year.");
+                        }
+                    }
 
                     
-                    zodiacMethod person = new zodiacMethod(name, birthDate.toString());// Create a Person object
-        
-                    zodiacSign zodiac = new zodiacSign(birthDate);// Create a ZodiacSign object using the person's birthdate
-        
+                    boolean validMonth = false;
+                    while (!validMonth) {
+                        try {
+                            System.out.print("Enter your month of birth (MM): ");
+                            month = Integer.parseInt(scanner.nextLine());
+                            if (month < 1 || month > 12) {
+                                System.out.println("Invalid month. Please enter a number between 1 and 12.");
+                            } else {
+                                validMonth = true; 
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid input. Please enter a valid number for the month.");
+                        }
+                    }
+
+                    
+                    boolean validDay = false;
+                    while (!validDay) {
+                        try {
+                            System.out.print("Enter your day of birth (DD): ");
+                            day = Integer.parseInt(scanner.nextLine());
+
+                            
+                            birthDate = LocalDate.of(year, month, day);
+
+                           
+                            validInput = true;
+                            validDay = true; 
+                        } catch (DateTimeParseException e) {
+                            System.out.println("Invalid date. The day you entered is not valid for the given month and year. Please try again.");
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid input. Please enter a valid number for the day.");
+                        }
+                    }
+
+                    
+                    zodiacMethod person = new zodiacMethod(name, birthDate.toString());
+
+                    
+                    zodiacSign zodiac = new zodiacSign(birthDate);
+
+                    
                     System.out.println("\n--- Zodiac Information ---");
                     System.out.println("Your Name: " + person.getName());
                     System.out.println("Your Age: " + person.getAge());
                     System.out.println("Date of Birth: " + person.getDateOfBirth());
-                    System.out.println("Zodiac Sign: " + zodiac.getZodiacSign());     // Output the results
+                    System.out.println("Zodiac Sign: " + zodiac.getZodiacSign());
                     System.out.println("Lucky Number: " + zodiac.getLuckyNumber());
                     System.out.println("Love Life: " + zodiac.getLoveLife());
                     System.out.println("Destiny: " + zodiac.getDestiny());
 
-                } catch (DateTimeParseException e) {
-                    System.out.println("Invalid date. Please try again.");
-                } catch (NumberFormatException e) {
-                    System.out.println("Invalid input. Please enter valid numeric values for year, month, and day.");
                 } catch (Exception e) {
-                    System.out.println("An error occurred. Please try again.");
+                    System.out.println("An unexpected error occurred. Please try again.");
                 }
             }
 
             
-            System.out.print("Do you want to enter another person's information? (yes/no): "); // Ask the user if they want to try again
+            System.out.print("Do you want to enter another person's information? (yes/y/no): ");
             String response = scanner.nextLine().trim().toLowerCase();
 
             
-            if (!response.equals("yes")) {// Check if the user wants to continue
-
-                continueApp = false; // Exit the loop if the user does not want to continue
+            if (!response.equals("yes") && !response.equals("y")) {
+                continueApp = false; 
             }
         }
         System.out.println("Thank you for using the Zodiac App!");
